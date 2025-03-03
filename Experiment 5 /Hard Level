@@ -1,0 +1,91 @@
+Hard Level:
+Develop a ticket booking system with synchronized threads to ensure no double booking of seats. Use thread priorities to simulate VIP bookings being processed first.
+
+
+Code:
+
+class TicketBookingSystem {
+    private int availableSeats = 10;
+
+    // Synchronized method to ensure thread safety (no double booking)
+    public synchronized boolean bookTicket(String customerType) {
+        if (availableSeats > 0) {
+            // Simulate booking process
+            System.out.println(customerType + " is booking a seat...");
+            availableSeats--;
+            System.out.println("Seat booked successfully for " + customerType + ". Available seats: " + availableSeats);
+            return true;
+        } else {
+            System.out.println("No available seats for " + customerType + ".");
+            return false;
+        }
+    }
+
+    public int getAvailableSeats() {
+        return availableSeats;
+    }
+}
+
+class BookingThread extends Thread {
+    private TicketBookingSystem system;
+    private String customerType;
+
+    public BookingThread(TicketBookingSystem system, String customerType) {
+        this.system = system;
+        this.customerType = customerType;
+    }
+
+    @Override
+    public void run() {
+        // VIP customers get higher priority, so they try to book first
+        system.bookTicket(customerType);
+    }
+}
+
+public class TicketBookingApp {
+    public static void main(String[] args) throws InterruptedException {
+        TicketBookingSystem system = new TicketBookingSystem();
+
+        // Create threads for different customers
+        Thread vipCustomer1 = new BookingThread(system, "VIP Customer 1");
+        Thread vipCustomer2 = new BookingThread(system, "VIP Customer 2");
+        Thread regularCustomer1 = new BookingThread(system, "Regular Customer 1");
+        Thread regularCustomer2 = new BookingThread(system, "Regular Customer 2");
+
+        // Set thread priorities: VIP customers have higher priority (Thread.MAX_PRIORITY)
+        vipCustomer1.setPriority(Thread.MAX_PRIORITY);
+        vipCustomer2.setPriority(Thread.MAX_PRIORITY);
+
+        // Set regular customers' thread priority (Thread.NORM_PRIORITY by default)
+        regularCustomer1.setPriority(Thread.NORM_PRIORITY);
+        regularCustomer2.setPriority(Thread.NORM_PRIORITY);
+
+        // Start the threads
+        vipCustomer1.start();
+        vipCustomer2.start();
+        regularCustomer1.start();
+        regularCustomer2.start();
+
+        // Wait for all threads to finish
+        vipCustomer1.join();
+        vipCustomer2.join();
+        regularCustomer1.join();
+        regularCustomer2.join();
+
+        System.out.println("\nTicket booking process complete.");
+    }
+}
+
+Output:
+
+VIP Customer 1 is booking a seat...
+Seat booked successfully for VIP Customer 1. Available seats: 9
+VIP Customer 2 is booking a seat...
+Seat booked successfully for VIP Customer 2. Available seats: 8
+Regular Customer 1 is booking a seat...
+Seat booked successfully for Regular Customer 1. Available seats: 7
+Regular Customer 2 is booking a seat...
+Seat booked successfully for Regular Customer 2. Available seats: 6
+
+Ticket booking process complete.
+
