@@ -1,0 +1,105 @@
+Medium Level:
+Create a Java program to serialize and deserialize a Student object. The program should:
+
+Serialize a Student object (containing id, name, and GPA) and save it to a file.
+
+Deserialize the object from the file and display the student details.
+
+Handle FileNotFoundException, IOException, and ClassNotFoundException using exception handling.
+
+Code:
+
+import java.io.*;
+
+// Define the Student class that implements Serializable
+class Student implements Serializable {
+    private int id;
+    private String name;
+    private double gpa;
+
+    // Constructor to initialize the Student object
+    public Student(int id, String name, double gpa) {
+        this.id = id;
+        this.name = name;
+        this.gpa = gpa;
+    }
+
+    // Getters for the fields
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getGpa() {
+        return gpa;
+    }
+
+    // Method to display student details
+    public void displayStudentDetails() {
+        System.out.println("Student ID: " + id);
+        System.out.println("Student Name: " + name);
+        System.out.println("Student GPA: " + gpa);
+    }
+}
+
+public class StudentSerializationDemo {
+
+    // Method to serialize the Student object and save it to a file
+    public static void serializeStudent(Student student, String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(student);
+            System.out.println("Student object serialized successfully and saved to file.");
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: File not found.");
+        } catch (IOException e) {
+            System.out.println("Error: IOException occurred while serializing the student.");
+        }
+    }
+
+    // Method to deserialize the Student object from a file
+    public static Student deserializeStudent(String filename) {
+        Student student = null;
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            student = (Student) in.readObject();
+            System.out.println("Student object deserialized successfully.");
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: File not found.");
+        } catch (IOException e) {
+            System.out.println("Error: IOException occurred while deserializing the student.");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Error: ClassNotFoundException occurred while deserializing the student.");
+        }
+        return student;
+    }
+
+    public static void main(String[] args) {
+        // Create a Student object
+        Student student1 = new Student(1, "John Doe", 3.8);
+
+        // Serialize the student object to a file
+        String filename = "student.ser";
+        serializeStudent(student1, filename);
+
+        // Deserialize the student object from the file
+        Student deserializedStudent = deserializeStudent(filename);
+
+        // Display the student details if the object was successfully deserialized
+        if (deserializedStudent != null) {
+            deserializedStudent.displayStudentDetails();
+        }
+    }
+}
+
+Output:
+Student object serialized successfully and saved to file.
+Student object deserialized successfully.
+Student ID: 1
+Student Name: John Doe
+Student GPA: 3.8
+
+
+
+
